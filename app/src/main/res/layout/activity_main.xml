@@ -9,20 +9,27 @@
     tools:context=".MainActivity">
 
     <LinearLayout
+        android:orientation="vertical"
         android:layout_width="match_parent"
         android:gravity="center"
         android:layout_height="wrap_content">
-        <HorizontalScrollView
-            android:id="@+id/hscrollView"
-            android:overScrollMode="never"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent">
+
             <com.example.myapplication.weight.LedView
                 android:id="@+id/led_view"
-                android:layout_width="match_parent"
+                android:layout_width="300dp"
                 android:layout_height="300dp"
                 />
-        </HorizontalScrollView>
+        <Button
+            android:id="@+id/btn_reverser"
+            android:text="reverser"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+        <Button
+            android:id="@+id/btn_clear"
+            android:text="clear"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
 
     </LinearLayout>
 

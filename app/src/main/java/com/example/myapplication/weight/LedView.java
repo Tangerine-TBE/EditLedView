@@ -65,16 +65,15 @@ public class LedView extends View {
         this.ledSize = PrefUtils.getIntFromPrefs(getContext(), "_pix", 11);
         DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
         if (paramInt == this.ledSize) {
-            this.bias = ((displayMetrics.widthPixels - this.w) / 2);
+            this.bias =0.0F;
         } else {
             this.bias = 0.0F;
         }
         this.mPaint.setColor(this.lightOffColor);
         for (byte b = 0; b < this.ledSize; b++) {
             for (byte b1 = 0; b1 < paramInt; b1++) {
-                float f1 = b1;
                 float f2 = this.ledBeadRadius;
-                paramCanvas.drawCircle(f1 * f2 * 2.0F + f2 + this.bias, b * f2 * 2.0F + f2, f2, this.mPaint);
+                paramCanvas.drawCircle((float) b1 * f2 * 2.0F + f2 + this.bias, b * f2 * 2.0F + f2, f2, this.mPaint);
             }
         }
     }
@@ -187,9 +186,9 @@ public class LedView extends View {
 
     public void clear() {
         this.ledData = initLEDData();
-        int i = PrefUtils.getIntFromPrefs(getContext(), "_pix", 11);
-        this.ledSize = i;
-        this.ledBeadRadius = w / i * 2.0F;
+//        int i = PrefUtils.getIntFromPrefs(getContext(), "_pix", 11);
+//        this.ledSize = i;
+//        this.ledBeadRadius = w / i * 2.0F;
         invalidate();
     }
 
@@ -323,9 +322,9 @@ public class LedView extends View {
         str = str.replace('2', '1');
         this.ledData = str;
         this.ledData = str.replace('3', '0');
-        int i = PrefUtils.getIntFromPrefs(getContext(), "_pix", 11);
-        this.ledSize = i;
-        this.ledBeadRadius = this.w / i * 2.0F;
+//        int i = PrefUtils.getIntFromPrefs(getContext(), "_pix", 11);
+//        this.ledSize = i;
+//        this.ledBeadRadius = this.w / i * 2.0F;
         invalidate();
     }
 
