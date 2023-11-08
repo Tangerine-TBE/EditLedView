@@ -1,5 +1,6 @@
 package com.example.myapplication.weight;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -16,17 +17,12 @@ import com.example.myapplication.Utils.ViewUtils;
 
 public class LedView extends View {
 
-    private int backgroundColor = Color.parseColor("#FFFFFF");
-
-    private float bias = 0.0F;
-
-    private int h;
 
     private boolean isCanTouch = true;
 
     private float ledBeadRadius;
 
-    private int ledBrightColor = Color.parseColor("#F8171D");
+    private final int ledBrightColor = Color.parseColor("#F8171D");
 
     private int ledColSize = 11;
 
@@ -34,7 +30,7 @@ public class LedView extends View {
 
     private int ledSize = 11;
 
-    private int lightOffColor = Color.parseColor("#ABADA8");
+    private final int lightOffColor = Color.parseColor("#ABADA8");
 
     private Paint mPaint;
 
@@ -63,17 +59,11 @@ public class LedView extends View {
 
     private void drawAllLedBead(Canvas paramCanvas, int paramInt) {
         this.ledSize = PrefUtils.getIntFromPrefs(getContext(), "_pix", 11);
-        DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
-        if (paramInt == this.ledSize) {
-            this.bias =0.0F;
-        } else {
-            this.bias = 0.0F;
-        }
         this.mPaint.setColor(this.lightOffColor);
         for (byte b = 0; b < this.ledSize; b++) {
             for (byte b1 = 0; b1 < paramInt; b1++) {
                 float f2 = this.ledBeadRadius;
-                paramCanvas.drawCircle((float) b1 * f2 * 2.0F + f2 + this.bias, b * f2 * 2.0F + f2, f2, this.mPaint);
+                paramCanvas.drawCircle((float) b1 * f2 * 2.0F + f2 , b * f2 * 2.0F + f2, f2, this.mPaint);
             }
         }
     }
@@ -84,9 +74,8 @@ public class LedView extends View {
         for (byte b = 0; b < this.ledSize; b++) {
             for (byte b1 = 0; b1 < this.ledColSize; b1++) {
                 if (isLEDBeadBright(paramString, b, b1)) {
-                    float f2 = b1;
                     float f1 = this.ledBeadRadius;
-                    paramCanvas.drawCircle(f2 * f1 * 2.0F + f1 + this.bias, b * f1 * 2.0F + f1, f1, this.mPaint);
+                    paramCanvas.drawCircle((float) b1 * f1 * 2.0F + f1 , b * f1 * 2.0F + f1, f1, this.mPaint);
                 }
             }
         }
@@ -97,7 +86,7 @@ public class LedView extends View {
         float f = Math.max(0.0F, paramFloat2);
         paramFloat2 = this.ledBeadRadius;
         int i = (int) (f / paramFloat2 / 2.0F);
-        int j = (int) ((paramFloat1 - this.bias) / paramFloat2 / 2.0F);
+        int j = (int) (paramFloat1 / paramFloat2 / 2.0F);
         if (i + 1 <= this.ledSize) {
             int k = this.ledColSize;
             if (j + 1 <= k) {
@@ -199,7 +188,7 @@ public class LedView extends View {
     protected void onDraw(Canvas paramCanvas) {
         super.onDraw(paramCanvas);
         this.ledSize = PrefUtils.getIntFromPrefs(getContext(), "_pix", 11);
-        StringBuilder stringBuilder = new StringBuilder();
+        @SuppressLint("DrawAllocation") StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("ledColSize = ");
         stringBuilder.append(this.ledColSize);
         stringBuilder.append(" ledData = ");
@@ -213,7 +202,7 @@ public class LedView extends View {
     protected void onMeasure(int paramInt1, int paramInt2) {
         super.onMeasure(paramInt1, paramInt2);
         DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
-        StringBuilder stringBuilder = new StringBuilder();
+        @SuppressLint("DrawAllocation") StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("col size = ");
         stringBuilder.append(this.ledColSize);
         Log.e("LEDView OnMeasure", stringBuilder.toString());
@@ -226,17 +215,17 @@ public class LedView extends View {
     }
 
     protected void onSizeChanged(int paramInt1, int paramInt2, int paramInt3, int paramInt4) {
-        this.h = Math.min(paramInt1, paramInt2);
+        int h = Math.min(paramInt1, paramInt2);
         paramInt2 = PrefUtils.getIntFromPrefs(getContext(), "_pix", 11);
         this.ledSize = paramInt2;
-        paramInt1 = this.h;
+        paramInt1 = h;
         this.ledBeadRadius = paramInt1 / paramInt2/2.0f;
         this.w = paramInt1;
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("初始化数据 宽高[ width = ");
         stringBuilder.append(this.w);
         stringBuilder.append(", height = ");
-        stringBuilder.append(this.h);
+        stringBuilder.append(h);
         stringBuilder.append(" ]");
         Log.d("PY", stringBuilder.toString());
         stringBuilder = new StringBuilder();
@@ -245,9 +234,10 @@ public class LedView extends View {
         stringBuilder.append(", 半径 = ");
         stringBuilder.append(this.ledBeadRadius);
         Log.d("PY", stringBuilder.toString());
-        super.onSizeChanged(this.w, this.h, paramInt3, paramInt4);
+        super.onSizeChanged(this.w, h, paramInt3, paramInt4);
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     public boolean onTouchEvent(MotionEvent paramMotionEvent) {
         StringBuilder stringBuilder = null;
         int i = paramMotionEvent.getAction();
@@ -333,10 +323,9 @@ public class LedView extends View {
     }
 
     public void setLEDData(String paramString) {
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("setLEDData - ");
-        stringBuilder.append(paramString);
-        Log.e("888888", stringBuilder.toString());
+        String stringBuilder = "setLEDData - " +
+                paramString;
+        Log.e("888888", stringBuilder);
         String str = paramString;
         if (TextUtils.isEmpty(paramString)) str = initLEDData();
         this.ledSize = PrefUtils.getIntFromPrefs(getContext(), "_pix", 11);
