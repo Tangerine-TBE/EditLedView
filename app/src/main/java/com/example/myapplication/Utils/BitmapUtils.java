@@ -25,7 +25,7 @@ public class BitmapUtils {
                 bool = (m & 0xFF) > paramInt3;
                 if ((0xFF00 & m) >> 8 <= paramInt3)
                     c = Character.MIN_VALUE;
-                arrayOfInt[k] = bool | (m & 0xFF000000) >> 24 << 24 | b2 << 16 | c << 8;
+                arrayOfInt[k] = (bool ? 0xFF000000 : 0) | (b2 << 16) | (c << 8) | (m & 0xFF);
                 if (arrayOfInt[k] == -1) {
                     arrayOfInt[k] = -1;
                 } else {
