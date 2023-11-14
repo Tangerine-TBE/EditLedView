@@ -332,7 +332,6 @@ public class LedView extends View {
         int j = str.length();
         int i = this.ledSize;
         this.ledColSize = j / i;
-        this.ledBeadRadius = this.w / i * 2.0F;
         this.ledData = str;
         invalidate();
     }

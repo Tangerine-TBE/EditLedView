@@ -16,19 +16,25 @@ import android.widget.SeekBar;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatSeekBar;
+import androidx.fragment.app.Fragment;
 
+import com.bumptech.glide.Glide;
 import com.example.myapplication.Utils.BitmapUtils;
 import com.example.myapplication.Utils.GlideEngine;
+import com.example.myapplication.Utils.ImageCropEngine;
 import com.example.myapplication.weight.LedView;
 import com.jakewharton.rxbinding4.view.RxView;
 import com.luck.picture.lib.basic.PictureSelector;
 import com.luck.picture.lib.config.SelectMimeType;
+import com.luck.picture.lib.engine.CropEngine;
 import com.luck.picture.lib.engine.UriToFileTransformEngine;
 import com.luck.picture.lib.entity.LocalMedia;
 import com.luck.picture.lib.interfaces.OnKeyValueResultCallbackListener;
 import com.luck.picture.lib.interfaces.OnResultCallbackListener;
 import com.luck.picture.lib.utils.SandboxTransformUtils;
 import com.tbruyelle.rxpermissions3.RxPermissions;
+import com.yalantis.ucrop.UCrop;
+import com.yalantis.ucrop.UCropImageEngine;
 
 import java.io.File;
 import java.math.BigDecimal;
@@ -40,6 +46,7 @@ public class MainActivity extends AppCompatActivity {
     private ImageView mCustomView;
     private AppCompatSeekBar mThresholdController;
     private Bitmap mOriginBitmap;
+    private Bitmap mEffectBitmap;
 
     @SuppressLint({"MissingInflatedId", "ClickableViewAccessibility", "CheckResult"})
     @Override
@@ -55,8 +62,10 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
                 if (mOriginBitmap != null) {
-                    Bitmap mEffectBitmap = BitmapUtils.convertToBlackAndWhite(mOriginBitmap, i);
+                    mEffectBitmap = BitmapUtils.convertToBlackAndWhite(mOriginBitmap, i);
                     mCustomView.setImageBitmap(mEffectBitmap);
+                    Bitmap scaledBitmap = Bitmap.createScaledBitmap(mEffectBitmap,11, 11, true);
+                    ledBig.setLEDData( BitmapUtils.getLedData(scaledBitmap));
                 }
 
             }
@@ -68,41 +77,43 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
+                if (mEffectBitmap != null) {
 
+                }
             }
         });
         RxPermissions rxPermissions = new RxPermissions(this);
-        RxView.clicks(findViewById(R.id.btn_canTouch)).compose(rxPermissions.ensure(Manifest.permission.READ_EXTERNAL_STORAGE))
-                        .subscribe(granted ->{
-                            if(granted){
-                                PictureSelector.create(this).openGallery(SelectMimeType.ofImage()).setSandboxFileEngine(new UriToFileTransformEngine() {
-                                    @Override
-                                    public void onUriToFileAsyncTransform(Context context, String srcPath, String mineType, OnKeyValueResultCallbackListener call) {
-                                        if (call != null) {
-                                            String sandboxPath = SandboxTransformUtils.copyPathToSandbox(context, srcPath, mineType);
-                                            call.onCallback(srcPath,sandboxPath);
-                                        }
-                                    }
-                                }).setImageEngine(GlideEngine.createGlideEngine()).setMaxSelectNum(1).forResult(new OnResultCallbackListener<LocalMedia>() {
-                                    @Override
-                                    public void onResult(ArrayList<LocalMedia> result) {
-                                        LocalMedia localMedia = result.get(0);
-                                        if (localMedia != null) {
-                                            String filePath = localMedia.getSandboxPath();
-                                            Bitmap originBitmap = BitmapFactory.decodeFile(filePath);
-                                            mOriginView.setImageBitmap(originBitmap);
-                                            mOriginBitmap = originBitmap;
-                                            mCustomView.setImageBitmap(BitmapUtils.convertToBlackAndWhite(originBitmap, 0));
-                                        }
-                                    }
+        RxView.clicks(findViewById(R.id.btn_canTouch)).compose(rxPermissions.ensure(Manifest.permission.READ_EXTERNAL_STORAGE)).subscribe(granted -> {
+            if (granted) {
+                PictureSelector.create(this).openGallery(SelectMimeType.ofImage()).setSandboxFileEngine(new UriToFileTransformEngine() {
+                    @Override
+                    public void onUriToFileAsyncTransform(Context context, String srcPath, String mineType, OnKeyValueResultCallbackListener call) {
+                        if (call != null) {
+                            String sandboxPath = SandboxTransformUtils.copyPathToSandbox(context, srcPath, mineType);
+                            call.onCallback(srcPath, sandboxPath);
+                        }
+                    }
+                }).setCropEngine(new ImageCropEngine(1,1)).setImageEngine(GlideEngine.createGlideEngine()).setMaxSelectNum(1).forResult(new OnResultCallbackListener<LocalMedia>() {
+                    @Override
+                    public void onResult(ArrayList<LocalMedia> result) {
+                        LocalMedia localMedia = result.get(0);
+                        if (localMedia != null) {
+                            String filePath = localMedia.getSandboxPath();
+                            Bitmap originBitmap = BitmapFactory.decodeFile(filePath);
+                            Bitmap scaledBitmap = Bitmap.createScaledBitmap(originBitmap, (int) (originBitmap.getWidth() * 0.25), (int) (originBitmap.getHeight() * 0.25), true);
+                            mOriginView.setImageBitmap(scaledBitmap);
+                            mOriginBitmap = scaledBitmap;
+                            mCustomView.setImageBitmap(BitmapUtils.convertToBlackAndWhite(scaledBitmap, 0));
+                        }
+                    }
 
-                                    @Override
-                                    public void onCancel() {
+                    @Override
+                    public void onCancel() {
 
-                                    }
-                                });
-                            }
-                        });
+                    }
+                });
+            }
+        });
         findViewById(R.id.btn_reverser).setOnClickListener(view -> ledBig.reverse());
         findViewById(R.id.btn_clear).setOnClickListener(view -> ledBig.clear());
         findViewById(R.id.btn_save).setOnClickListener(view -> {
@@ -120,7 +131,7 @@ public class MainActivity extends AppCompatActivity {
                 b++;
                 continue;
             }
-            this.ledBig.setLEDData(stringBuilder.toString());
+//            this.ledBig.setLEDData(stringBuilder.toString());
             return;
         }
     }
