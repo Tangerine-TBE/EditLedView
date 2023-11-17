@@ -77,15 +77,12 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-                if (mEffectBitmap != null) {
-
-                }
             }
         });
-        RxPermissions rxPermissions = new RxPermissions(this);
-        RxView.clicks(findViewById(R.id.btn_canTouch)).compose(rxPermissions.ensure(Manifest.permission.READ_EXTERNAL_STORAGE)).subscribe(granted -> {
-            if (granted) {
-                PictureSelector.create(this).openGallery(SelectMimeType.ofImage()).setSandboxFileEngine(new UriToFileTransformEngine() {
+        findViewById(R.id.btn_canTouch).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                PictureSelector.create(MainActivity.this).openGallery(SelectMimeType.ofImage()).setSandboxFileEngine(new UriToFileTransformEngine() {
                     @Override
                     public void onUriToFileAsyncTransform(Context context, String srcPath, String mineType, OnKeyValueResultCallbackListener call) {
                         if (call != null) {
