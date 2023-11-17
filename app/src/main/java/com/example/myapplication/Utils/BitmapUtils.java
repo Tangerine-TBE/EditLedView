@@ -58,9 +58,9 @@ public class BitmapUtils {
         int i;
         for (i = 0; i < j; i++) {
             if (arrayOfInt[i] == -1) {
-                stringBuilder1.append("1");
-            } else {
                 stringBuilder1.append("0");
+            } else {
+                stringBuilder1.append("1");
             }
         }
         String str1 = stringBuilder1.toString();
